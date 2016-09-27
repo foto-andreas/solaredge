@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o pipefail
+
 cd /opt/SolarEdge/solaredge || exit 99
 
 INTERFACE=enx0023573c8964
