@@ -1,8 +1,7 @@
 #!/bin/bash -
 
-INTERFACE=eth1
-ROOTDIR=/root/data/
-PREFIX=
+INTERFACE=enx0023573c8964
+ROOTDIR=/data/SolarEdge/json
 
 # wait for the time to get set
 while [ `date +%Y` == "1969" ]
@@ -11,4 +10,4 @@ do
 	sleep 1
 done
 
-python /root/solaredge/semonitor.py -vv -n $INTERFACE | tee $ROOTDIR$PREFIX`date +%Y%m%d%H%M%S`.json | python /root/solaredge/se2state.py -o /root/solar.json
+tail -f $ROOTDIR/`date +%Y%m%d`.json | python se2state.py -o $ROOTDIR/solar.json

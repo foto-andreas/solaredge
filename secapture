@@ -1,14 +1,24 @@
-#!/bin/bash -
+#!/bin/bash
 
-INTERFACE=eth1
-ROOTDIR=/root/pcap/
-PREFIX=
+cd /opt/SolarEdge/solaredge || exit 99
 
-# wait for the time to get set
-while [ `date +%Y` == "1969" ]
-do
-	echo "Waiting for correct time"
-	sleep 1
-done
+INTERFACE=enx0023573c8964
 
-/usr/bin/tcpdump -i $INTERFACE -U -w $ROOTDIR$PREFIX`date +%Y%m%d%H%M%S`.pcap tcp
+DATA=/data/SolarEdge
+
+CAPDIR=$DATA/pcap
+JSONDIR=$DATA/json
+LOGDIR=$DATA/log
+STATDIR=$DATA
+
+DATE=`date +%Y%m%d`
+
+/usr/sbin/tcpdump -i $INTERFACE -U -w - tcp | \
+	tee -a $CAPDIR/$DATE.pcap | \
+	python seextract.py | \
+	python semonitor.py -vvv \
+		-d $LOGDIR/$DATE.log \
+		-k 7E19F79D.key \
+		-a | \
+	tee -a $JSONDIR/$DATE.json | \
+	python se2state.py -o $STATDIR/solar.json
