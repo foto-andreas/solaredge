@@ -1,0 +1,10 @@
+[Unit]
+Description=SolarEdge Capture via ethernet sniffing
+After=syslog.target
+
+[Service]
+ExecStart=/opt/SolarEdge/solaredge/secapture
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
