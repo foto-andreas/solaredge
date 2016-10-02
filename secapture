@@ -4,7 +4,7 @@ set -o pipefail
 
 cd /opt/SolarEdge/solaredge || exit 99
 
-INTERFACE=enx0023573c8964
+INTERFACE=br0
 
 DATA=/data/SolarEdge
 
@@ -23,4 +23,4 @@ DATE=`date +%Y%m%d`
 		-k 7E19F79D.key \
 		-a | \
 	tee -a $JSONDIR/$DATE.json | \
-	python se2state.py -o $STATDIR/solar.json
+	python se2state-as.py -o $STATDIR/solar.json
