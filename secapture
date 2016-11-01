@@ -4,7 +4,7 @@ set -o pipefail
 
 cd /opt/SolarEdge/solaredge || exit 99
 
-INTERFACE=br0
+INTERFACE=enx0023573c8964
 
 DATA=/data/SolarEdge
 
@@ -17,8 +17,7 @@ DATE=`date +%Y%m%d`
 
 /usr/sbin/tcpdump -i $INTERFACE -U -w - tcp | \
 	tee -a $CAPDIR/$DATE.pcap | \
-	python seextract.py | \
-	python semonitor.py -vvv \
+	python semonitor.py \
 		-d $LOGDIR/$DATE.log \
 		-k 7E19F79D.key \
 		-a | \

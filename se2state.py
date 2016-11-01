@@ -47,3 +47,4 @@ while True:
     # update the state file
     with open(outFileName, "w") as outFile:
         json.dump(stateDict, outFile)
+
