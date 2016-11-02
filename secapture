@@ -21,5 +21,6 @@ DATE=`date +%Y%m%d`
 		-d $LOGDIR/$DATE.log \
 		-k 7E19F79D.key \
 		-a | \
+        cat $JSONDIR/$DATE.json - | \
 	tee -a $JSONDIR/$DATE.json | \
 	python se2state-as.py -o $STATDIR/solar.json
