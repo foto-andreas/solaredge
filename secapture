@@ -5,6 +5,7 @@ set -o pipefail
 cd /opt/SolarEdge/solaredge || exit 99
 
 INTERFACE=enx0023573c8964
+INTERFACE=eth0
 
 DATA=/data/SolarEdge
 
@@ -15,12 +16,28 @@ STATDIR=$DATA
 
 DATE=`date +%Y%m%d`
 
-/usr/sbin/tcpdump -i $INTERFACE -U -w - tcp | \
-	tee -a $CAPDIR/$DATE.pcap | \
-	python semonitor.py \
+PIPE=/tmp/secapture-pipe
+
+rm -f $PIPE
+mkfifo $PIPE
+
+
+python semonitor.py \
 		-d $LOGDIR/$DATE.log \
 		-k 7E19F79D.key \
-		-a | \
-        cat $JSONDIR/$DATE.json - | \
-	tee -a $JSONDIR/$DATE.json | \
-	python se2state-as.py -o $STATDIR/solar.json
+		-a <$PIPE | \
+	tee $JSONDIR/$DATE.json | \
+	python se2state-as.py -o $STATDIR/solar.json &
+
+echo "reader running" >&2
+
+if [ -f  $CAPDIR/$DATE.pcap ]; then
+  echo "old file catted" >&2
+  python seextract.py $CAPDIR/$DATE.pcap >$PIPE
+fi
+
+echo "begin to dump" >&2
+/usr/sbin/tcpdump -i $INTERFACE -U -w - tcp | \
+	tee -a $CAPDIR/$DATE.pcap | \
+	python seextract.py >$PIPE
+
