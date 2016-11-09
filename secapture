@@ -17,10 +17,27 @@ STATDIR=$DATA
 DATE=`date +%Y%m%d`
 
 PIPE=/tmp/secapture-pipe
+SMLPIPE=/tmp/sml-pipe
 
 rm -f $PIPE
 mkfifo $PIPE
 
+rm -f $SMLPIPE
+mkfifo $SMLPIPE
+
+while read smlline; do 
+        if [ "${smlline:0:1}" = "{" ]; then
+	        echo "$smlline"  >> $JSONDIR/sml-$DATE.jsons
+        	echo "$smlline"  > $STATDIR/sml.json.tmp
+	        mv $STATDIR/sml.json.tmp $STATDIR/sml.json
+	fi
+done <$SMLPIPE &
+
+echo "sml pipe reader running"
+
+java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader.jar /dev/ttyUSB1 2>/dev/null > $SMLPIPE &
+
+echo "smlreader running"
 
 python semonitor.py \
 		-d $LOGDIR/$DATE.log \
