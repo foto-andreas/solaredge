@@ -12,6 +12,7 @@ DATA=/data/SolarEdge
 CAPDIR=$DATA/pcap
 JSONDIR=$DATA/json
 LOGDIR=$DATA/log
+FLDIR=$DATA/firstAndLast
 STATDIR=$DATA
 
 DATE=`date +%Y%m%d`
@@ -28,6 +29,9 @@ mkfifo $SMLPIPE
 while read smlline; do 
         if [ "${smlline:0:1}" = "{" ]; then
 	        echo "$smlline"  >> $JSONDIR/sml-$DATE.jsons
+		[ ! -f $FLDIR/$DATE-first-sml.json ] && echo "$smlline"  > $FLDIR/$DATE-first-sml.json
+		echo "$smlline"  > $FLDIR/$DATE-last-sml.json.tmp
+		mv $FLDIR/$DATE-last-sml.json.tmp $FLDIR/$DATE-last-sml.json
         	echo "$smlline"  > $STATDIR/sml.json.tmp
 	        mv $STATDIR/sml.json.tmp $STATDIR/sml.json
 	fi
@@ -35,7 +39,7 @@ done <$SMLPIPE &
 
 echo "sml pipe reader running"
 
-java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader.jar /dev/ttyUSB1 2>/dev/null > $SMLPIPE &
+java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader.jar /dev/ttyUSB1 2>$LOGDIR/sml-$DATE.log > $SMLPIPE &
 
 echo "smlreader running"
 
