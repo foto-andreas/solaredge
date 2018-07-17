@@ -33,7 +33,7 @@ while True:
     jsonStr = ""
     # wait for data
     while jsonStr == "":
-        time.sleep(.1)
+        time.sleep(.5)
         jsonStr = inFile.readline()
     inDict = json.loads(jsonStr)
     # check for resetted optimizers and handle uptime and eday for them

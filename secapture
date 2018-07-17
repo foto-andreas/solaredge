@@ -45,7 +45,7 @@ echo "smlreader running"
 
 python semonitor.py \
 		-d $LOGDIR/$DATE.log \
-		-k 7E19F79D.key \
+		-k BE040526.key \
 		-a <$PIPE | \
 	tee $JSONDIR/$DATE.json | \
 	python se2state-as.py -o $STATDIR/solar.json &
