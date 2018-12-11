@@ -29,7 +29,9 @@ mkfifo $SMLPIPE
 while read smlline; do 
         if [ "${smlline:0:1}" = "{" ]; then
 	        echo "$smlline"  >> $JSONDIR/sml-$DATE.jsons
-		[ ! -f $FLDIR/$DATE-first-sml.json ] && echo "$smlline"  > $FLDIR/$DATE-first-sml.json
+		if [ ! -f $FLDIR/$DATE-first-sml.json ]; then
+                  echo "$smlline"  > $FLDIR/$DATE-first-sml.json
+                fi
 		echo "$smlline"  > $FLDIR/$DATE-last-sml.json.tmp
 		mv $FLDIR/$DATE-last-sml.json.tmp $FLDIR/$DATE-last-sml.json
         	echo "$smlline"  > $STATDIR/sml.json.tmp
@@ -44,6 +46,7 @@ java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader.jar /dev/ttyU
 echo "smlreader running"
 
 python semonitor.py \
+                -vvvv \
 		-d $LOGDIR/$DATE.log \
 		-k BE040526.key \
 		-a <$PIPE | \
