@@ -41,27 +41,28 @@ done <$SMLPIPE &
 
 echo "sml pipe reader running"
 
-java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader.jar /dev/ttyUSB1 2>$LOGDIR/sml-$DATE.log > $SMLPIPE &
+sleep 10
+
+java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader-20181231-1.jar /dev/ttyUSB1 2>>$LOGDIR/sml-$DATE.log >>$SMLPIPE &
 
 echo "smlreader running"
 
 python semonitor.py \
-                -vvvv \
 		-d $LOGDIR/$DATE.log \
 		-k BE040526.key \
 		-a <$PIPE | \
 	tee $JSONDIR/$DATE.json | \
-	python se2state-as.py -o $STATDIR/solar.json &
+	python se2state.py -o $STATDIR/solar.json &
 
 echo "reader running" >&2
 
 if [ -f $CAPDIR/$DATE.pcap ]; then
   echo "old file catted" >&2
-  tshark -r $CAPDIR/$DATE.pcap -T fields -e data | ./utilities/unhexlify.py >$PIPE
+  tshark -r $CAPDIR/$DATE.pcap -T fields -e data | ./utilities/unhexlify.py >>$PIPE
 fi
 
 echo "begin to dump" >&2
 /usr/sbin/tcpdump -i $INTERFACE -U -w - tcp | \
 	tee -a $CAPDIR/$DATE.pcap | \
-	tshark -r - -T fields -e data | ./utilities/unhexlify.py >$PIPE
+	tshark -r - -T fields -e data | ./utilities/unhexlify.py >>$PIPE
 
