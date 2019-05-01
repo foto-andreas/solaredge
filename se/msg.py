@@ -151,7 +151,7 @@ def readBytes(inFile, recFile, length, mode):
         return inBuf
     # treat exceptions as end of file
     except Exception as ex:
-        logger.info("Exception:", exc_info=ex)
+        logger.info("Exception while reading data: "+str(ex))
         return ""
 
 # A function to attempt to load the the rotating key from the last0503.msg file
