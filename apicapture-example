@@ -1,0 +1,15 @@
+#!/bin/bash
+
+API=api
+
+cd /data/SolarEdge || exit 99
+
+while true; do
+  DATE=`date +%Y%m%d`
+  TIME=`date +%H%M%S`
+  wget -O api.json https://monitoringapi.solaredge.com/site/308483/overview.json?api_key=XXXXXXXXXXXX
+  DIR=api/$DATE
+  mkdir -p $DIR
+  cp api.json $DIR/api-$DATE-$TIME.json
+  sleep 600
+done

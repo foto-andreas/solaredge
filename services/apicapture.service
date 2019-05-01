@@ -1,0 +1,9 @@
+[Unit]
+Description=SolarEdge API capture
+After=syslog.target
+[Service]
+ExecStart=/opt/SolarEdge/solaredge/apicapture
+Restart=on-abort
+[Install]
+WantedBy=multi-user.target
+
