@@ -58,11 +58,11 @@ echo "reader running" >&2
 
 if [ -f $CAPDIR/$DATE.pcap ]; then
   echo "old file catted" >&2
-  tshark -r $CAPDIR/$DATE.pcap -T fields -e data | ./utilities/unhexlify.py >>$PIPE
+  tshark -r $CAPDIR/$DATE.pcap -T fields -e data | xxd -r -p >>$PIPE
 fi
 
 echo "begin to dump" >&2
 /usr/sbin/tcpdump --time-stamp-precision=micro -i $INTERFACE -U -w - tcp | \
 	tee -a $CAPDIR/$DATE.pcap | \
-	tshark -r - -T fields -e data | ./utilities/unhexlify.py >>$PIPE
+	tshark -r - -T fields -e data | xxd -r -p >>$PIPE
 

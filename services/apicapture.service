@@ -1,7 +1,10 @@
 [Unit]
 Description=SolarEdge API capture
 After=syslog.target
+After=multi-user.target
+After=network-online.target
 [Service]
+ExecStartPre=/bin/sleep 2
 ExecStart=/opt/SolarEdge/solaredge/apicapture
 Restart=on-abort
 [Install]
