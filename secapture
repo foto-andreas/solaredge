@@ -16,7 +16,7 @@ FLDIR=$DATA/firstAndLast
 STATDIR=$DATA
 
 DATE=0
-while [ $DATE < 20190000 ]; do
+while [ $DATE -lt 20190000 ]; do
   sleep 1
   DATE=`date +%Y%m%d`
 done
@@ -61,6 +61,8 @@ echo "reader running" >&2
 d=`stat -c "%y" last0503.msg | cut -f 1 -d\ `
 d=${d//-}
 
+mv last0503.msg last0503.msg.saved
+
 if [ $d != $DATE ]; then
   if [ -f $CAPDIR/$d.pcap ]; then
     echo "old file $d.pcap catted" >&2
@@ -76,6 +78,8 @@ if [ -f $CAPDIR/$DATE.pcap ]; then
   echo "old file $DATE.pcap catted" >&2
   tshark -r $CAPDIR/$DATE.pcap -T fields -e data | xxd -r -p >>$PIPE
 fi
+
+cp last0503.msg.saved last0503.msg
 
 echo "begin to dump" >&2
 /usr/sbin/tcpdump --time-stamp-precision=micro -i $INTERFACE -U -w - tcp | \
