@@ -15,7 +15,11 @@ LOGDIR=$DATA/log
 FLDIR=$DATA/firstAndLast
 STATDIR=$DATA
 
-DATE=`date +%Y%m%d`
+DATE=0
+while [ $DATE < 20190000 ]; do
+  sleep 1
+  DATE=`date +%Y%m%d`
+done
 
 PIPE=/tmp/secapture-pipe
 SMLPIPE=/tmp/sml-pipe
@@ -41,8 +45,6 @@ done <$SMLPIPE &
 
 echo "sml pipe reader running"
 
-sleep 10
-
 java -Djava.library.path=/usr/lib/jni -jar ../sml/SmartMeterReader-20181231-1.jar /dev/ttyUSB1 2>>$LOGDIR/sml-$DATE.log >>$SMLPIPE &
 
 echo "smlreader running"
@@ -56,8 +58,22 @@ python semonitor.py -vvvv \
 
 echo "reader running" >&2
 
+d=`stat -c "%y" last0503.msg | cut -f 1 -d\ `
+d=${d//-}
+
+if [ $d != $DATE ]; then
+  if [ -f $CAPDIR/$d.pcap ]; then
+    echo "old file $d.pcap catted" >&2
+    tshark -r $CAPDIR/$DATE.pcap -T fields -e data | xxd -r -p >>$PIPE
+  fi
+  if [ -f $CAPDIR/$d.pcap.gz ]; then
+    echo "old file $d.pcap.gz catted" >&2
+    zcat $CAPDIR/$d.pcap.gz tshark -r - -T fields -e data | xxd -r -p >>$PIPE
+  fi
+fi
+
 if [ -f $CAPDIR/$DATE.pcap ]; then
-  echo "old file catted" >&2
+  echo "old file $DATE.pcap catted" >&2
   tshark -r $CAPDIR/$DATE.pcap -T fields -e data | xxd -r -p >>$PIPE
 fi
 
